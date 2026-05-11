@@ -5,7 +5,7 @@ from sentence_transformers import (
 )
 
 
-MODEL_NAME = "BAAI/bge-small-en-v1.5"
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 INTENT_EXAMPLES = {
