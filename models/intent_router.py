@@ -1,4 +1,11 @@
-import re
+import numpy as np
+
+from sentence_transformers import (
+    SentenceTransformer
+)
+
+
+MODEL_NAME = "BAAI/bge-small-en-v1.5"
 
 
 INTENT_EXAMPLES = {
@@ -32,8 +39,7 @@ INTENT_EXAMPLES = {
         "why was this recommended",
         "explain recommendation",
         "reason for selecting this assessment",
-        "why is this suitable",
-        "tell me about this assessment"
+        "why is this suitable"
     ],
 
     "compare": [
@@ -51,34 +57,25 @@ INTENT_EXAMPLES = {
     ],
 
     "qa": [
-        "Does this support remote testing",
-        "Which languages are supported",
-        "Is this adaptive",
-        "What job levels are supported",
-        "What does this assessment measure",
-        "Is this suitable for entry-level hiring"
+        "Does this support remote testing?",
+        "Which languages are supported?",
+        "Is this adaptive?",
+        "What job levels are supported?",
+        "What does this assessment measure?",
+        "Is this suitable for entry-level hiring?"
     ]
 }
-
-
-def tokenize(text):
-
-    text = text.lower()
-
-    text = re.sub(
-        r"[^a-z0-9 ]",
-        " ",
-        text
-    )
-
-    return set(text.split())
 
 
 class SemanticIntentRouter:
 
     def __init__(self):
 
-        self.intent_tokens = {}
+        self.model = SentenceTransformer(
+            MODEL_NAME
+        )
+
+        self.intent_embeddings = {}
 
         self._build_intent_index()
 
@@ -88,111 +85,47 @@ class SemanticIntentRouter:
             INTENT_EXAMPLES.items()
         ):
 
-            token_set = set()
+            embeddings = self.model.encode(
+                examples,
+                normalize_embeddings=True
+            )
 
-            for example in examples:
+            centroid = np.mean(
+                embeddings,
+                axis=0
+            )
 
-                tokens = tokenize(example)
-
-                token_set.update(tokens)
-
-            self.intent_tokens[
+            self.intent_embeddings[
                 intent
-            ] = token_set
+            ] = centroid
 
-    def compute_similarity(
-        self,
-        query_tokens,
-        intent_tokens
-    ):
+    def detect_intent(self, query):
 
-        intersection = len(
-            query_tokens.intersection(
-                intent_tokens
-            )
+        query_embedding = self.model.encode(
+            query,
+            normalize_embeddings=True
         )
 
-        union = len(
-            query_tokens.union(
-                intent_tokens
-            )
-        )
+        best_intent = None
+        best_score = -1
 
-        if union == 0:
-            return 0.0
-
-        return intersection / union
-
-    def detect_intent(
-        self,
-        query
-    ):
-
-        query_tokens = tokenize(query)
-
-        best_intent = "recommend"
-
-        best_score = 0.0
-
-        for intent, intent_tokens in (
-            self.intent_tokens.items()
+        for intent, centroid in (
+            self.intent_embeddings.items()
         ):
 
-            score = self.compute_similarity(
-                query_tokens,
-                intent_tokens
+            score = np.dot(
+                query_embedding,
+                centroid
             )
 
             if score > best_score:
 
                 best_score = score
-
                 best_intent = intent
-
-        # fallback heuristics
-
-        query_lower = query.lower()
-
-        if any(
-            word in query_lower
-            for word in [
-                "compare",
-                "difference",
-                "better"
-            ]
-        ):
-
-            best_intent = "compare"
-
-        elif any(
-            word in query_lower
-            for word in [
-                "explain",
-                "why",
-                "tell me about"
-            ]
-        ):
-
-            best_intent = "explain"
-
-        elif any(
-            word in query_lower
-            for word in [
-                "also",
-                "include",
-                "add",
-                "remove"
-            ]
-        ):
-
-            best_intent = "refine"
 
         return {
             "intent": best_intent,
-            "score": round(
-                best_score,
-                4
-            )
+            "score": float(best_score)
         }
 
 
