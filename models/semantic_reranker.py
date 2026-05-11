@@ -6,7 +6,7 @@ import numpy as np
 
 
 MODEL_NAME = (
-    "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    "cross-encoder/ms-marco-MiniLM-L-2-v2"
 )
 
 
