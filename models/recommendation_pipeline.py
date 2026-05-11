@@ -108,8 +108,8 @@ def initialize_system():
     print("Loading system...")
     catalog = load_catalog()
     bm25 = build_bm25(catalog)
-    index = load_faiss_index(catalog, model)
     model = load_model()
+    index = load_faiss_index(catalog, model)
 
     policy_engine = (
         DialogPolicyEngine()
