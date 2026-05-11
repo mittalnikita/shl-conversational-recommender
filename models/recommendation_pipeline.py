@@ -20,17 +20,95 @@ MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = BASE_DIR / "data"
-
 CATALOG_FILE = DATA_DIR / "catalog.json"
 
-FAISS_INDEX_FILE = (DATA_DIR / "shl_index.faiss")
+
+# ---------- FAISS ----------
+
+import os
+import faiss
+import numpy as np
+
+
+def build_faiss_index(
+    catalog,
+    model
+):
+
+    texts = []
+
+    for item in catalog:
+
+        text = (
+            item.get("name", "")
+            + " "
+            + item.get(
+                "description",
+                ""
+            )
+        )
+
+        texts.append(text)
+
+    embeddings = model.encode(
+        texts,
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    )
+
+    dimension = embeddings.shape[1]
+
+    index = faiss.IndexFlatIP(
+        dimension
+    )
+
+    index.add(
+        embeddings.astype(
+            np.float32
+        )
+    )
+
+    return index
+
+
+def load_faiss_index(
+    catalog,
+    model
+):
+
+    if os.path.exists(
+        FAISS_INDEX_FILE
+    ):
+
+        return faiss.read_index(
+            str(FAISS_INDEX_FILE)
+        )
+
+    print(
+        "Building FAISS index..."
+    )
+
+    index = build_faiss_index(
+        catalog,
+        model
+    )
+
+    faiss.write_index(
+        index,
+        str(FAISS_INDEX_FILE)
+    )
+
+    return index
 
 def initialize_system():
 
     print("Loading system...")
     catalog = load_catalog()
     bm25 = build_bm25(catalog)
-    index = load_faiss()
+    index = load_faiss_index(
+        catalog,
+        model
+    )
     model = load_model()
 
     policy_engine = (
@@ -84,12 +162,6 @@ def build_bm25(catalog):
     ]
 
     return BM25Okapi(corpus)
-
-
-# ---------- FAISS ----------
-
-def load_faiss():
-    return faiss.read_index(str(FAISS_INDEX_FILE))
 
 
 # ---------- Embedding Model ----------
