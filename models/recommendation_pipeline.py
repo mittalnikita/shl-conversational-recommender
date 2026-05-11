@@ -16,7 +16,7 @@ from models.compare_assessment import (compare_assessments)
 from models.explain_assessment import (explain_assessment)
 from models.domain_classifier import (DomainClassifier)
 
-MODEL_NAME = "BAAI/bge-small-en-v1.5"
+MODEL_NAME = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATA_DIR = BASE_DIR / "data"
