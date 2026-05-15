@@ -74,26 +74,29 @@ I --> J[Frontend Response]
 
 ## Tech Stack
 
-### Backend
-- FastAPI
-- Python
+<p align="left">
 
-### Frontend
-- Streamlit
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="45" height="45"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="45" height="45"/>
+<img src="https://streamlit.io/images/brand/streamlit-logo-primary-colormark-darktext.png" width="120"/>
+<img src="https://avatars.githubusercontent.com/u/78043063?s=200&v=4" width="45" height="45"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg" width="70"/>
+<img src="https://numpy.org/images/logo.svg" width="70"/>
+<img src="https://pandas.pydata.org/static/img/pandas_mark.svg" width="45" height="45"/>
+<img src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/groq.png" width="45" height="45"/>
 
-### Retrieval
-- BM25
-- Retrieval orchestration
+</p>
 
-### Conversational AI
-- Intent Routing
-- Query Synthesis
-- Constraint Extraction
-- Dialog Policy Engine
-
-### LLM
-- Groq API
-- Llama 3.1 8B Instant
+| Layer | Technologies |
+|---|---|
+| Backend | FastAPI, Python |
+| Frontend | Streamlit |
+| Conversational AI | Intent Routing, Dialog Policy Engine, Query Synthesis |
+| Retrieval | BM25, Retrieval Orchestration |
+| NLP Pipeline | Constraint Extraction, Conversation Reconstruction |
+| LLM Integration | Groq API, Llama 3.1 8B Instant |
+| Data Processing | NumPy, Pandas, Scikit-learn |
+| Deployment | Hugging Face Spaces |
 
 ---
 
